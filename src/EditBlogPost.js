@@ -1,14 +1,16 @@
 // EditBlogPost.js
 import React, { useState, useEffect } from 'react';
 import { updateDoc, doc } from 'firebase/firestore';
-import { db } from './firebase'; // Adjust the path according to your folder structure
-import { useAuth } from './AuthContext'; // Assuming you have an AuthContext
-import { Button, TextField, Typography, Container } from '@mui/material';
+import { db } from './firebase';
+import { useAuth } from './AuthContext';
+import { Button, TextField, Typography, Container, Snackbar } from '@mui/material';
 
 const EditBlogPost = ({ post, onClose, onPostUpdated }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const { user } = useAuth(); // Get the authenticated user
+    const [errorMessage, setErrorMessage] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const { user } = useAuth();
 
     useEffect(() => {
         if (post) {
@@ -20,16 +22,24 @@ const EditBlogPost = ({ post, onClose, onPostUpdated }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (post.userId !== user.uid) {
+            setErrorMessage("You are not authorized to edit this post.");
+            setSnackbarOpen(true);
+            return;
+        }
+
         try {
             await updateDoc(doc(db, 'blogPosts', post.id), {
                 title,
                 content,
                 updatedAt: new Date(),
             });
-            onPostUpdated(); // Callback to refresh the list
-            onClose(); // Close the modal after updating
+            const updatedPost = { ...post, title, content }; // Create updated post object
+            onPostUpdated(updatedPost); // Call the callback with the updated post
         } catch (error) {
             console.error("Error updating document: ", error);
+            setErrorMessage("Error updating document: " + error.message);
+            setSnackbarOpen(true);
         }
     };
 
@@ -62,6 +72,12 @@ const EditBlogPost = ({ post, onClose, onPostUpdated }) => {
                     Cancel
                 </Button>
             </form>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={() => setSnackbarOpen(false)}
+                message={errorMessage}
+            />
         </Container>
     );
 };

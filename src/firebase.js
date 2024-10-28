@@ -1,3 +1,5 @@
+
+// firebase.js
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
@@ -16,10 +18,8 @@ const firebaseConfig = {
 
 // Initialize Firebase only if it hasn't been initialized yet
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const auth = getAuth(app); // Initialize Firebase Auth
+const analytics = getAnalytics(app); // This is optional; remove if not needed
+const db = getFirestore(app); // Firestore database instance
+const auth = getAuth(app); // Firebase Auth instance
 
-export { db, auth, analytics };
-
-
+export { db, auth, analytics }; // Exporting db and auth

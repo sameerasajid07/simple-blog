@@ -1,37 +1,36 @@
+// App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import CreateBlogPost from './CreateBlogPost'; 
-import UserBlogPosts from './UserBlogPosts'; 
-import PublicBlogView from './PublicBlogView'; // Public view for all users
-import Login from './Login'; // Your login component
-import Register from './Register'; // Your register component
-import { AuthProvider } from './AuthContext'; // Importing AuthProvider for authentication context
-import Navigation from './Navigation'; // Optional: Create a Navigation component for easy navigation
-import ProtectedRoute from './ProtectedRoute'; // ProtectedRoute for route protection
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import CreateBlogPost from './CreateBlogPost';
+import UserBlogPosts from './UserBlogPosts';
+import PublicBlogView from './PublicBlogView';
+import Login from './Login';
+import Register from './Register';
+import { AuthProvider, useAuth } from './AuthContext';
+import Navigation from './Navigation';
+import ProtectedRoute from './ProtectedRoute';
 
 const App = () => {
     return (
         <AuthProvider>
             <Router>
-                {/* Optional: Navigation component for better UX */}
                 <Navigation />
                 <Routes>
-                    <Route path="/" element={<PublicBlogView />} /> {/* Home page with public blogs */}
-                    <Route path="/login" element={<Login />} /> {/* Login page */}
-                    <Route path="/register" element={<Register />} /> {/* Registration page */}
-                    
-                    {/* Protected routes for creating blog post and viewing user posts */}
+                    <Route path="/" element={<PublicBlogView />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
                     <Route path="/create" element={
                         <ProtectedRoute>
                             <CreateBlogPost />
                         </ProtectedRoute>
                     } />
-                    
                     <Route path="/my-posts" element={
                         <ProtectedRoute>
                             <UserBlogPosts />
                         </ProtectedRoute>
                     } />
+                    {/* Redirect any unknown routes to home */}
+                    <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </Router>
         </AuthProvider>

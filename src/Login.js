@@ -1,57 +1,43 @@
+// Login.js
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
-import { Button, TextField, Typography, Container, Snackbar } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
     const { login } = useAuth();
+    const navigate = useNavigate(); // For redirection
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleLogin = async (e) => {
+        e.preventDefault(); // Prevent default form submission
         try {
             await login(email, password);
+            navigate('/'); // Redirect to home after successful login
         } catch (error) {
-            setErrorMessage('Login failed: ' + error.message);
-            setSnackbarOpen(true);
+            console.error("Login Error:", error.message);
+            alert("Login failed: " + error.message); // Show error message
         }
     };
 
     return (
-        <Container sx={{ marginTop: 4 }}>
-            <Typography variant="h4" gutterBottom>Login</Typography>
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    label="Email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    fullWidth
-                    required
-                    margin="normal"
-                />
-                <TextField
-                    label="Password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    fullWidth
-                    required
-                    margin="normal"
-                />
-                <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Login
-                </Button>
-            </form>
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={6000}
-                onClose={() => setSnackbarOpen(false)}
-                message={errorMessage}
+        <form onSubmit={handleLogin}>
+            <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                required
             />
-        </Container>
+            <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+            />
+            <button type="submit">Login</button>
+        </form>
     );
 };
 

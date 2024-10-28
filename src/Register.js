@@ -1,70 +1,48 @@
 import React, { useState } from 'react';
-import { useAuth } from './AuthContext';
-import { Button, TextField, Typography, Container, Snackbar } from '@mui/material';
+import { register } from './auth'; // Import the register function from auth.js
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [username, setUsername] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const { signup } = useAuth(); // Ensure this matches your context
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            await signup(email, password); // Ensure username is handled in your auth flow if needed
-            // Optionally reset fields or redirect user after successful signup
-        } catch (error) {
-            setErrorMessage('Registration failed: ' + error.message);
-            setSnackbarOpen(true);
+            await register(email, password);
+            navigate('/'); // Redirect after successful registration
+        } catch (err) {
+            setError(err.message);
         }
     };
 
     return (
-        <Container sx={{ marginTop: 4 }}>
-            <Typography variant="h4" gutterBottom>Register</Typography>
-            <form onSubmit={handleSubmit}>
-                <TextField
-                    label="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    fullWidth
-                    required
-                    margin="normal"
-                />
-                <TextField
-                    label="Email"
+        <div>
+            <h2>Register</h2>
+            {error && <p>{error}</p>}
+            <form onSubmit={handleRegister}>
+                <input
                     type="email"
+                    placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    fullWidth
-                    required
-                    margin="normal"
                 />
-                <TextField
-                    label="Password"
+                <input
                     type="password"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    fullWidth
-                    required
-                    margin="normal"
                 />
-                <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Register
-                </Button>
+                <button type="submit">Register</button>
             </form>
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={6000}
-                onClose={() => setSnackbarOpen(false)}
-                message={errorMessage}
-            />
-        </Container>
+        </div>
     );
 };
 
 export default Register;
+
+
 
 

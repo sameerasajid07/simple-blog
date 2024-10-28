@@ -1,6 +1,7 @@
+// AuthContext.js
 import React, { useContext, useState, useEffect, createContext } from 'react';
 import { auth } from './firebase'; // Ensure 'auth' is exported correctly from firebase.js
-import { onAuthStateChanged, createUserWithEmailAndPassword } from 'firebase/auth';
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 // Create the AuthContext
 const AuthContext = createContext();
@@ -34,17 +35,35 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Signin function
+    const login = async (email, password) => {
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            console.error("Signin Error:", error.message);
+            throw error; // Rethrow the error to handle it in the component
+        }
+    };
+
+    // Signout function
+    const signout = async () => {
+        try {
+            await signOut(auth);
+            setUser(null); // Reset user state
+        } catch (error) {
+            console.error("Signout Error:", error.message);
+        }
+    };
+
     if (loading) {
         return <div>Loading...</div>; // Optional loading state
     }
 
     return (
-        <AuthContext.Provider value={{ user, signup }}>
+        <AuthContext.Provider value={{ user, signup, login, signout }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export default AuthContext;
-
-
+export default AuthContext; // Default export for the context

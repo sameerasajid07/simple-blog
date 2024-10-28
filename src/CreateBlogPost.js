@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from './firebase';
 import { useAuth } from './AuthContext';
-import { Button, TextField, Typography, Container } from '@mui/material';
+import { Button, TextField, Typography, Container, Snackbar } from '@mui/material';
 
 const CreateBlogPost = () => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
     const { user } = useAuth();
 
     const handleSubmit = async (e) => {
@@ -21,10 +23,14 @@ const CreateBlogPost = () => {
                 updatedAt: new Date(),
             });
 
+            // Reset form fields after successful submission
             setTitle('');
             setContent('');
+            setSnackbarOpen(true); // Show success message
         } catch (error) {
             console.error("Error adding document: ", error);
+            setErrorMessage("Error adding document: " + error.message);
+            setSnackbarOpen(true); // Show error message
         }
     };
 
@@ -56,6 +62,13 @@ const CreateBlogPost = () => {
                     Create Blog Post
                 </Button>
             </form>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={() => setSnackbarOpen(false)}
+                message={errorMessage || "Blog post created successfully!"}
+            />
         </Container>
     );
 };
